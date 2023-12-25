@@ -6,47 +6,23 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 
   if (downloadButton) {
-    downloadButton.addEventListener('click', function() {
-      const scale = window.devicePixelRatio; // Geräte-Pixel-Verhältnis verwenden // neu
-
-      html2canvas(document.querySelector('.card'), { 
-        scale: scale, // Anpassung der Skalierung für bessere Qualität, damals 2
-        useCORS: true
-      }).then(canvas => {
-        const imgData = canvas.toDataURL('image/png', 1.0);
-        const pdf = new jspdf.jsPDF({
-
-          // orientation: canvas.width > canvas.height ? 'landscape' : 'portrait',
-          // unit: 'mm',
-          // format: 'a6'
-
-          orientation: 'landscape',
-          unit: 'px',
-          format: [canvas.width / scale, canvas.height / scale]
-        });
-  
-        // Berechnen Sie das Seitenverhältnis des Bildes
-        const canvasAspectRatio = canvas.width / canvas.height;
-        const a4AspectRatio = pdf.internal.pageSize.getWidth() / pdf.internal.pageSize.getHeight();
-        let imgWidth = pdf.internal.pageSize.getWidth();
-        let imgHeight = pdf.internal.pageSize.getHeight();
-        
-        // Anpassung der Bildgröße, um Verzerrung zu vermeiden
-        if (canvasAspectRatio > a4AspectRatio) {
-          // Canvas ist breiter als A4
-          imgHeight = imgWidth / canvasAspectRatio;
-        } else {
-          // Canvas ist höher als A4
-          imgWidth = imgHeight * canvasAspectRatio;
-        }
-  
-        const x = (pdf.internal.pageSize.getWidth() - imgWidth) / 2;
-        const y = (pdf.internal.pageSize.getHeight() - imgHeight) / 2;
-  
-        pdf.addImage(imgData, 'PNG', x, y, imgWidth, imgHeight);
-        pdf.save('visitenkarte.pdf');
-      });
+    document.getElementById('download-pdf').addEventListener('click', function() {
+  const scale = window.devicePixelRatio; // Geräte-Pixel-Verhältnis verwenden
+  html2canvas(document.querySelector('.card'), {
+    scale: scale,
+    useCORS: true
+  }).then(canvas => {
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF({
+      orientation: 'landscape',
+      unit: 'px',
+      format: [canvas.width / scale, canvas.height / scale]
     });
+    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width / scale, canvas.height / scale);
+    pdf.save('visitenkarte.pdf');
+  });
+});
+
   } 
 
   // Funktion, um den Dark Mode zu aktivieren
